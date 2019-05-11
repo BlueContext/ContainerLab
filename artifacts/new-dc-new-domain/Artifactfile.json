@@ -1,0 +1,42 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/schemas/2016-11-28/dtlArtifacts.json",
+    "title": "psscript-new-dc-in-new-forest",
+    "description": "A PS script to promote an initial domain in a new forest (requires Windows 2019)",
+    "iconUri": "",
+    "targetOsType": "Windows",
+    "parameters": {
+        "DatabasePath": {
+            "type": "string",
+            "displayName": "Database Path",
+            "description": "ADDS database path",
+            "defaultValue": "C:\\Windows\\NTDS"
+        },
+        "DomainName": {
+            "type": "string",
+            "displayName": "Domain Name",
+            "description": "Domain DNS name, like domain.name",
+            "defaultValue": "container.lab"
+        },
+        "DomainNetbiosName": {
+            "type": "string",
+            "displayName": "Domain Netbios Name",
+            "description": "Domain short name, like DOMAINNAME",
+            "defaultValue": "CONTAINERLAB"
+        },
+        "LogPath": {
+            "type": "string",
+            "displayName": "Log Path",
+            "description": "ADDS DB log path",
+            "defaultValue": "C:\\Windows\\NTDS"
+        },
+        "SysvolPath": {
+            "type": "string",
+            "displayName": "Sysvol Path",
+            "description": "ADDS sysvol share path",
+            "defaultValue": "C:\\Windows\\SYSVOL"
+        }
+    },
+    "runCommand": {
+        "commandToExecute": "[concat('powershell.exe -File new-dc-new-domain.ps1', ' -databasePath ', parameters('DatabasePath'), ' -domainName ', parameters('DomainName'), ' -domainNetbiosName ', parameters('DomainNetBiosName'), ' -logPath ', parameters('LogPath'), ' -sysvolPath ', parameters('SysvolPath'))]"
+    }
+}
