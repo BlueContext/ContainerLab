@@ -34,9 +34,14 @@
             "displayName": "Sysvol Path",
             "description": "ADDS sysvol share path",
             "defaultValue": "C:\\Windows\\SYSVOL"
+        },
+        "Password": {
+            "type": "securestring",
+            "displayName": "Password",
+            "description": "Password for the Safe Mode Administrator account"
         }
     },
     "runCommand": {
-        "commandToExecute": "[concat('powershell.exe -File new-dc-new-domain.ps1', ' -databasePath ', parameters('DatabasePath'), ' -domainName ', parameters('DomainName'), ' -domainNetbiosName ', parameters('DomainNetBiosName'), ' -logPath ', parameters('LogPath'), ' -sysvolPath ', parameters('SysvolPath'))]"
+        "commandToExecute": "[concat('powershell.exe -File new-dc-new-domain.ps1', ' -databasePath ', parameters('DatabasePath'), ' -domainName ', parameters('DomainName'), ' -domainNetbiosName ', parameters('DomainNetBiosName'), ' -logPath ', parameters('LogPath'), ' -sysvolPath ', parameters('SysvolPath'), ' -password ', parameters('Password'))]"
     }
 }
