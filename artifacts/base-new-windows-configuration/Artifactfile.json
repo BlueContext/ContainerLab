@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/schemas/2016-11-28/dtlArtifacts.json",
+    "title": "psscript-base-new-windows-configuration",
+    "description": "A PS script for basic configuration of Windows servers in this lab",
+    "iconUri": "",
+    "targetOsType": "Windows",
+    "parameters": {
+        "Domain": {
+            "type": "string",
+            "displayName": "Domain Name",
+            "description": "It doesn't matter, you just need a paramter or the artifact won't work"
+        }
+    },
+    "runCommand": {
+        "commandToExecute": "[concat('powershell.exe -File base-new-windows-configuration.ps1', ' -domain ', parameters('Domain'))]"
+    }
+}
