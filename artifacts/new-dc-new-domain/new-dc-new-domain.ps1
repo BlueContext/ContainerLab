@@ -14,6 +14,8 @@ Install-WindowsFeature AD-Domain-Services, RSAT, RSAT-Role-Tools, RSAT-AD-Tools,
 
 Import-Module ADDSDeployment
 
-Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath $databasePath -DomainMode WinThreshold -DomainName $domainName -DomainNetbiosName $domainNetbiosName -ForestMode WinThreshold -InstallDns:$true -LogPath $logPath -NoRebootOnCompletion:$false -SysVolPath $sysvolPath -SafeModeAdministratorPassword $password -Force:$true
+$pwd = ConvertTo-SecureString $password -AsPlainText -Force
+
+Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath $databasePath -DomainMode WinThreshold -DomainName $domainName -DomainNetbiosName $domainNetbiosName -ForestMode WinThreshold -InstallDns:$true -LogPath $logPath -NoRebootOnCompletion:$false -SysVolPath $sysvolPath -SafeModeAdministratorPassword $pwd -Force:$true
 
 
