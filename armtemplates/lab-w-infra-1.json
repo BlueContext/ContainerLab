@@ -1,0 +1,144 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "newVMName": {
+        "type": "string",
+        "defaultValue": "lab-w-infra-1"
+      },
+      "labName": {
+        "type": "string",
+        "defaultValue": "containerlab"
+      },
+      "size": {
+        "type": "string",
+        "defaultValue": "Standard_B2s"
+      },
+      "userName": {
+        "type": "string",
+        "defaultValue": "kwbaker"
+      },
+      "password": {
+        "type": "securestring",
+        "defaultValue": "[[[kbaker]]"
+      },
+      "psscript-base-new-windows-configuration_Domain": {
+        "type": "string",
+        "defaultValue": "container.lab"
+      },
+      "psscript-new-dc-in-new-forest_DatabasePath": {
+        "type": "string",
+        "defaultValue": "C:\\Windows\\NTDS"
+      },
+      "psscript-new-dc-in-new-forest_DomainName": {
+        "type": "string",
+        "defaultValue": "container.lab"
+      },
+      "psscript-new-dc-in-new-forest_DomainNetbiosName": {
+        "type": "string",
+        "defaultValue": "CONTAINERLAB"
+      },
+      "psscript-new-dc-in-new-forest_LogPath": {
+        "type": "string",
+        "defaultValue": "C:\\Windows\\NTDS"
+      },
+      "psscript-new-dc-in-new-forest_SysvolPath": {
+        "type": "string",
+        "defaultValue": "C:\\Windows\\SYSVOL"
+      },
+      "psscript-new-dc-in-new-forest_Password": {
+        "type": "securestring",
+        "defaultValue": "[[[kbaker]]"
+      }
+    },
+    "variables": {
+      "labSubnetName": "[concat(variables('labVirtualNetworkName'), 'Subnet')]",
+      "labVirtualNetworkId": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', parameters('labName'), variables('labVirtualNetworkName'))]",
+      "labVirtualNetworkName": "[concat('Dtl', parameters('labName'))]",
+      "vmId": "[resourceId ('Microsoft.DevTestLab/labs/virtualmachines', parameters('labName'), parameters('newVMName'))]",
+      "vmName": "[concat(parameters('labName'), '/', parameters('newVMName'))]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2018-10-15-preview",
+        "type": "Microsoft.DevTestLab/labs/virtualmachines",
+        "name": "[variables('vmName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+          "notes": "[smalldisk] Windows Server 2019 Datacenter Server Core",
+          "galleryImageReference": {
+            "offer": "WindowsServer",
+            "publisher": "MicrosoftWindowsServer",
+            "sku": "2019-Datacenter-Core-smalldisk",
+            "osType": "Windows",
+            "version": "latest"
+          },
+          "size": "[parameters('size')]",
+          "userName": "[parameters('userName')]",
+          "password": "[parameters('password')]",
+          "isAuthenticationWithSshKey": false,
+          "artifacts": [
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', parameters('labName'), 'privaterepo150', 'base-new-windows-configuration')]",
+              "parameters": [
+                {
+                  "name": "Domain",
+                  "value": "[parameters('psscript-base-new-windows-configuration_Domain')]"
+                }
+              ]
+            },
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', parameters('labName'), 'privaterepo150', 'new-dc-new-domain')]",
+              "parameters": [
+                {
+                  "name": "DatabasePath",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_DatabasePath')]"
+                },
+                {
+                  "name": "DomainName",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_DomainName')]"
+                },
+                {
+                  "name": "DomainNetbiosName",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_DomainNetbiosName')]"
+                },
+                {
+                  "name": "LogPath",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_LogPath')]"
+                },
+                {
+                  "name": "SysvolPath",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_SysvolPath')]"
+                },
+                {
+                  "name": "Password",
+                  "value": "[parameters('psscript-new-dc-in-new-forest_Password')]"
+                }
+              ]
+            }
+          ],
+          "labSubnetName": "[variables('labSubnetName')]",
+          "disallowPublicIpAddress": true,
+          "storageType": "Standard",
+          "allowClaim": false,
+          "networkInterface": {
+            "sharedPublicIpAddressConfiguration": {
+              "inboundNatRules": [
+                {
+                  "transportProtocol": "tcp",
+                  "backendPort": 3389
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {
+      "labVMId": {
+        "type": "string",
+        "value": "[variables('vmId')]"
+      }
+    }
+  }

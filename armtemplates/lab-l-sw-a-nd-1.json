@@ -1,0 +1,123 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "newVMName": {
+        "type": "string",
+        "defaultValue": "lab-l-sw-a-nd-1"
+      },
+      "labName": {
+        "type": "string",
+        "defaultValue": "containerlab"
+      },
+      "size": {
+        "type": "string",
+        "defaultValue": "Standard_B2s"
+      },
+      "userName": {
+        "type": "string",
+        "defaultValue": "kbaker"
+      },
+      "password": {
+        "type": "securestring",
+        "defaultValue": "[[[kbaker]]"
+      },
+      "Apt-Get_packages": {
+        "type": "string",
+        "defaultValue": "apt-transport-https ca-certificates curl gnupg-agent software-properties-common screenfetch"
+      },
+      "Apt-Get_update": {
+        "type": "string",
+        "defaultValue": "true"
+      },
+      "Apt-Get_options": {
+        "type": "string",
+        "defaultValue": ""
+      },
+      "PowerShell_on_Linux_packageUrl": {
+        "type": "string",
+        "defaultValue": "https://github.com/PowerShell/PowerShell/releases/download/v6.2.0/powershell_6.2.0-1.ubuntu.18.04_amd64.deb"
+      }
+    },
+    "variables": {
+      "labSubnetName": "[concat(variables('labVirtualNetworkName'), 'Subnet')]",
+      "labVirtualNetworkId": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', parameters('labName'), variables('labVirtualNetworkName'))]",
+      "labVirtualNetworkName": "[concat('Dtl', parameters('labName'))]",
+      "vmId": "[resourceId ('Microsoft.DevTestLab/labs/virtualmachines', parameters('labName'), parameters('newVMName'))]",
+      "vmName": "[concat(parameters('labName'), '/', parameters('newVMName'))]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2018-10-15-preview",
+        "type": "Microsoft.DevTestLab/labs/virtualmachines",
+        "name": "[variables('vmName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+          "notes": "Ubuntu Server 18.04 LTS",
+          "galleryImageReference": {
+            "offer": "UbuntuServer",
+            "publisher": "Canonical",
+            "sku": "18.04-LTS",
+            "osType": "Linux",
+            "version": "latest"
+          },
+          "size": "[parameters('size')]",
+          "userName": "[parameters('userName')]",
+          "password": "[parameters('password')]",
+          "isAuthenticationWithSshKey": false,
+          "artifacts": [
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', parameters('labName'), 'public repo', 'linux-apt-package')]",
+              "parameters": [
+                {
+                  "name": "packages",
+                  "value": "[parameters('Apt-Get_packages')]"
+                },
+                {
+                  "name": "update",
+                  "value": "[parameters('Apt-Get_update')]"
+                },
+                {
+                  "name": "options",
+                  "value": "[parameters('Apt-Get_options')]"
+                }
+              ]
+            },
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', parameters('labName'), 'public repo', 'linux-install-docker')]"
+            },
+            {
+              "artifactId": "[resourceId('Microsoft.DevTestLab/labs/artifactSources/artifacts', parameters('labName'), 'public repo', 'linux-powershell')]",
+              "parameters": [
+                {
+                  "name": "packageUrl",
+                  "value": "[parameters('PowerShell_on_Linux_packageUrl')]"
+                }
+              ]
+            }
+          ],
+          "labSubnetName": "[variables('labSubnetName')]",
+          "disallowPublicIpAddress": true,
+          "storageType": "Standard",
+          "allowClaim": false,
+          "networkInterface": {
+            "sharedPublicIpAddressConfiguration": {
+              "inboundNatRules": [
+                {
+                  "transportProtocol": "tcp",
+                  "backendPort": 22
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {
+      "labVMId": {
+        "type": "string",
+        "value": "[variables('vmId')]"
+      }
+    }
+  }
