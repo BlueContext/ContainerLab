@@ -10,7 +10,7 @@ param(
 
 
 
-Install-WindowsFeature AD-DomainServices, RSAT, RSAT-Role-Tools, RSAT-AD-Tools, RSAT-AD-PowerShell, DNS, RSAT-DNS-Server, DHCP
+Install-WindowsFeature AD-Domain-Services, RSAT, RSAT-Role-Tools, RSAT-AD-Tools, RSAT-AD-PowerShell, DNS, RSAT-DNS-Server, DHCP
 
 Import-Module ADDSDeployment
 
