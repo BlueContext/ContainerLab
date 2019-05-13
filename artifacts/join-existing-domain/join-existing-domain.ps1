@@ -5,7 +5,8 @@ param(
     [Parameter(Mandatory=$true)]$password
 )
 
-$credential = New-Object System.Management.Automation.PSCredential($username,$password)
+$pwd = ConvertTo-SecureString $password -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential($username,$pwd)
 
 Add-Computer -DomainName $domain -Credential $credential -Force
 
