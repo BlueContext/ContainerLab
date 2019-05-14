@@ -1,0 +1,18 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/schemas/2016-11-28/dtlArtifacts.json",
+    "title": "psscript-windows-docker-node-configuration",
+    "description": "A script to configure a Windows Server 2019 as a Docker host",
+    "iconUri": "",
+    "targetOsType": "Windows",
+    "parameters": {
+        "DomainName": {
+            "type": "string",
+            "displayName": "Domain Name",
+            "description": "Domain DNS name, like domain.name",
+            "defaultValue": "container.lab"
+        }
+    },
+    "runCommand": {
+        "commandToExecute": "[concat('powershell.exe -File windows-docker-node-configuration.ps1', ' -domainName ', parameters('DomainName'))]"
+    }
+}
